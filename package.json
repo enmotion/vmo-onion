@@ -1,0 +1,38 @@
+{
+  "name": "vmo-onion",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "description": "Promise onion model",
+  "main": "./dist/vmo-onion.umd.cjs",
+  "module": "./dist/vmo-onion.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/vmo-onion.js",
+      "require": "./dist/vmo-onion.umd.cjs"
+    },
+    "./*": "./*"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.4",
+    "@vitejs/plugin-vue": "^4.5.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.3.6",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.0",
+    "vite-plugin-dts": "^3.6.4",
+    "vue": "^3.4.27",
+    "vue-tsc": "^1.8.22"
+  }
+}
