@@ -51,6 +51,7 @@ onion.use(function(){
   return async (context)=>{
     return new Promise((resolve)=>{
       setTimeout(async ()=>{
+        context.name = 'mod'
         resolve(context)
       },2000)
     })
