@@ -5,19 +5,19 @@ onion.use(function(){
   // console.log('1')
   return async function(context,next){
     context.count = context.count || 0;
-    console.log(context);
+    console.log(JSON.stringify(context));
     await next();
     context.count = 0;
-    console.log(context);
+    console.log(JSON.stringify(context));
   }
 });
 onion.use(function(){
   // console.log('2')
   return async (context,next)=>{
     context.count = context.count+1;
-    console.log(context);
+     console.log(JSON.stringify(context));
     await next();
-    console.log(context);
+    console.log(JSON.stringify(context));
     context.count = context.count-1;
   }
 })
@@ -25,9 +25,9 @@ onion.use(function(){
   // console.log('3')
   return async (context,next)=>{
     context.count = context.count+1;
-    console.log(context);
+     console.log(JSON.stringify(context));
     await next();
-    console.log(context);
+     console.log(JSON.stringify(context));
     context.count = context.count-1;
   }
 })
@@ -37,9 +37,9 @@ onion.use(function(){
     return new Promise((resolve)=>{
       setTimeout(async ()=>{
         context.count = context.count+1;
-        console.log(context);
+        console.log(JSON.stringify(context));
         await next();
-        console.log(context);
+        console.log(JSON.stringify(context));
         context.count = context.count-1;
         resolve(context)
       },2000)
