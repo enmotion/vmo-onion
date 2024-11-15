@@ -4,7 +4,9 @@
 
 ## 安装
 
-当前库还未发布到 npm 或其他公共仓库，您可以直接克隆或复制此代码到项目中使用。
+```
+npm i vmo-onion
+```
 
 ## 使用方法
 
@@ -13,26 +15,29 @@
 确保您的项目支持 ES6 模块语法。您可以使用以下代码导入库：
 
 ```javascript
-import VmoOnion from './path_to_vmo_onion';
+import VmoOnion from 'vmo-onion';
 ```
 ### 定义中间件
 中间件是一个接收两个参数的函数：上下文对象和一个 next 函数。每个中间件可以选择是否调用 next 来传递控制到下一个中间件。
 
 ```javascript
-const middleware1 = (context, next) => {
-  console.log('Middleware 1 start');
-  context.value = 1;
-  return next().then(() => {
-    console.log('Middleware 1 end');
-  });
+const middleware1 = function(){
+  return async function(context,next){
+   console.log('Middleware 1 start');
+   context.value = 1;
+   await next();
+   context.value = 1;
+   console.log('Middleware 1 end');
+  }
 };
 
-const middleware2 = (context, next) => {
-  console.log('Middleware 2 start');
-  context.value = 2;
-  return next().then(() => {
-    console.log('Middleware 2 end');
-  });
+const middleware2 = function(){
+  return async function(context,next){
+   console.log('Middleware 2 start');
+   context.value = 2;
+   context.value = 2;
+   console.log('Middleware 2 end');
+  }
 };
 ```
 
@@ -72,18 +77,21 @@ import VmoOnion from './path_to_vmo_onion';
 const onion = new VmoOnion();
 
 // 定义中间件
-const middleware1 = (context, next) => {
-  console.log('Middleware 1: first step');
-  context.value = 1;
-  return next().then(() => {
-    console.log('Middleware 1: final step');
-  });
+const middleware1 = function(){
+  return async function(context,next){
+   console.log('Middleware 1: first step');
+   context.value +=1
+   await next()
+   console.log('Middleware 1: final step');
+  }
 };
 
-const middleware2 = (context, next) => {
-  console.log('Middleware 2: first step');
-  context.value = 2;
-  return next();
+const middleware2 = function(){
+  return async function(context,next){   
+   console.log('Middleware 2: first step');
+   context.value +=1
+   console.log('Middleware 2: final step');
+  }
 };
 
 // 使用中间件
@@ -106,6 +114,7 @@ onion.pipingData(initialContext)
 ```
 Middleware 1: first step
 Middleware 2: first step
+Middleware 2: final step
 Middleware 1: final step
 Processed Context: { value: 2 }
 ```

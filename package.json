@@ -1,8 +1,8 @@
 {
   "name": "vmo-onion",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
-  "private": true,
+  "private": false,
   "description": "Promise onion model",
   "main": "./dist/vmo-onion.umd.cjs",
   "module": "./dist/vmo-onion.js",
