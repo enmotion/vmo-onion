@@ -7,7 +7,6 @@
  * @FilePath: \mod-onion\src\index.js
  */
 'use strict'
-
 export type MiddleWare = (...arg: any) => (context: Record<string, any>, next: Function) => any
 /**
  * @class VmoOnion
@@ -15,14 +14,15 @@ export type MiddleWare = (...arg: any) => (context: Record<string, any>, next: F
  */
 export default class VmoOnion {
   private middlewares: MiddleWare[]
+  private composedMiddleware: Function | null = null
   /**
    * @constructor
    * @param {MiddleWare[]} [middlewares=[]] - 初始中间件数组
    * @description 构造函数，初始化中间件数组，并检查中间件的合法性。
    */
   constructor(middlewares?: MiddleWare[]) {
-    this.checkMiddleWares(middlewares || [])
-    this.middlewares = middlewares || []
+    this.checkMiddleWares(middlewares ?? [])
+    this.middlewares = middlewares?.map(mid => mid) ?? []
   }
   /**
    * @private
@@ -35,10 +35,9 @@ export default class VmoOnion {
     if (!Array.isArray(middlewares)) {
       throw new TypeError('Middlewares stack must be an array!')
     }
-    for (const fn of middlewares) {
-      if (typeof fn !== 'function') {
-        throw new TypeError('Middleware must be composed of functions!')
-      }
+
+    if (!middlewares.every(fn => typeof fn === 'function')) {
+      throw new TypeError('Middleware must be composed of functions!')
     }
   }
   /**
@@ -63,7 +62,7 @@ export default class VmoOnion {
         try {
           if (i <= index) return Promise.reject(new Error('next() called multiple times'))
           index = i
-          let fn = middlewares[i]()
+          let fn = middlewares[i]?.()
           if (i === middlewares.length) fn = next
           if (!fn) return Promise.resolve()
           return Promise.resolve(fn(context, dispatch.bind(null, i + 1)))
@@ -85,6 +84,7 @@ export default class VmoOnion {
       throw new TypeError('Middleware must be composed of functions!')
     }
     this.middlewares.push(func)
+    this.composedMiddleware = null // 当添入了新的中间件后，则会清理之前的缓存组合
   }
   /**
    * @public
@@ -96,10 +96,26 @@ export default class VmoOnion {
    */
   public async pipingData(data: Record<string, any>, middlewares?: MiddleWare[]) {
     try {
-      await this.compose(middlewares || this.middlewares)(data)
+      if (!!middlewares) {
+        this.checkMiddleWares(middlewares)
+        await this.compose(middlewares)(data)
+      } else {
+        await this.getComposedMiddleware()(data)
+      }
       return Promise.resolve(data)
     } catch (err) {
       return Promise.reject(err)
     }
+  }
+  /**
+   * @private
+   * @method getComposedMiddleware
+   * @returns {Function} 返回的最终组合方法
+   */
+  private getComposedMiddleware(): Function {
+    if (!this.composedMiddleware) {
+      this.composedMiddleware = this.compose(this.middlewares)
+    }
+    return this.composedMiddleware
   }
 }
