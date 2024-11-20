@@ -6,24 +6,24 @@
  * @Description: In User Settings Edit
  * @FilePath: \mod-onion\src\index.js
  */
-"use strict";
+'use strict'
 
-export type MiddleWare =(...arg:any)=>(context:Record<string,any>,next:Function)=>any;
+export type MiddleWare = (...arg: any) => (context: Record<string, any>, next: Function) => any
 /**
  * @class VmoOnion
  * @description 实现一个基于洋葱模型的中间件处理类，用于按顺序执行一系列中间件函数。
  */
-export default class VmoOnion{
-  private middlewares:MiddleWare[];
+export default class VmoOnion {
+  private middlewares: MiddleWare[]
   /**
    * @constructor
    * @param {MiddleWare[]} [middlewares=[]] - 初始中间件数组
    * @description 构造函数，初始化中间件数组，并检查中间件的合法性。
    */
-  constructor(middlewares?:MiddleWare[]){
-    this.checkMiddleWares(middlewares||[]);
-    this.middlewares = middlewares||[]
-  };
+  constructor(middlewares?: MiddleWare[]) {
+    this.checkMiddleWares(middlewares || [])
+    this.middlewares = middlewares || []
+  }
   /**
    * @private
    * @method checkMiddleWares
@@ -31,16 +31,16 @@ export default class VmoOnion{
    * @throws {TypeError} - 如果 middlewares 不是数组或包含非函数元素，则抛出 TypeError
    * @description 检查传入的中间件数组是否合法，必须是一个数组且所有元素都是函数。
    */
-  private checkMiddleWares(middlewares:MiddleWare[]){
-    if (!Array.isArray(middlewares)){
+  private checkMiddleWares(middlewares: MiddleWare[]) {
+    if (!Array.isArray(middlewares)) {
       throw new TypeError('Middlewares stack must be an array!')
     }
     for (const fn of middlewares) {
-      if (typeof fn !== 'function'){
+      if (typeof fn !== 'function') {
         throw new TypeError('Middleware must be composed of functions!')
-      } 
+      }
     }
-  };
+  }
   /**
    * @private
    * @method compose
@@ -48,47 +48,45 @@ export default class VmoOnion{
    * @returns {(context: Record<string, any>, next: MiddleWare) => any} - 组合后的中间件执行函数
    * @description 组合中间件数组，返回一个函数，该函数接收上下文对象和下一个中间件，并按顺序执行所有中间件。
    */
-  private compose(middlewares:MiddleWare[]):Function {
-    console.log(middlewares)
+  private compose(middlewares: MiddleWare[]): Function {
     this.checkMiddleWares(middlewares)
-    return function(context:Record<string,any>, next:MiddleWare) {
-      let index = -1;
-      return dispatch(0);
+    return function (context: Record<string, any>, next: MiddleWare) {
+      let index = -1
+      return dispatch(0)
       /**
        * @function dispatch
        * @param {number} i - 当前执行的中间件索引
        * @returns {Promise<any>} - 返回一个 Promise，用于异步处理中间件执行结果
        * @description 递归执行中间件，确保每个中间件只执行一次。
        */
-      function dispatch(i:number):any {
+      function dispatch(i: number): any {
         try {
-          if (i <= index) return Promise.reject(new Error('next() called multiple times'));
-          index = i;
-          let fn = middlewares[i]();
-          if (i === middlewares.length) fn = next;        
-          if (!fn) return Promise.resolve();
-          // console.log(fn,i,i+1)
-          return Promise.resolve(fn(context, dispatch.bind(null, i + 1)));
-        }catch (err) {
-          return Promise.reject(err);
+          if (i <= index) return Promise.reject(new Error('next() called multiple times'))
+          index = i
+          let fn = middlewares[i]()
+          if (i === middlewares.length) fn = next
+          if (!fn) return Promise.resolve()
+          return Promise.resolve(fn(context, dispatch.bind(null, i + 1)))
+        } catch (err) {
+          return Promise.reject(err)
         }
       }
-    };        
-  };
-   /**
+    }
+  }
+  /**
    * @public
    * @method use
    * @param {MiddleWare} func - 需要添加的中间件函数
    * @throws {TypeError} - 如果传入的 func 不是函数，则抛出 TypeError
    * @description 添加一个新的中间件函数到中间件数组中。
    */
-  public use(func:MiddleWare){
-    if (typeof func !== 'function'){
-      throw new TypeError('Middleware must be composed of functions!');
-    } 
-    this.middlewares.push(func);
-  };
-   /**
+  public use(func: MiddleWare) {
+    if (typeof func !== 'function') {
+      throw new TypeError('Middleware must be composed of functions!')
+    }
+    this.middlewares.push(func)
+  }
+  /**
    * @public
    * @method pipingData
    * @param {Record<string, any>} data - 传递给中间件的上下文数据
@@ -96,12 +94,12 @@ export default class VmoOnion{
    * @returns {Promise<Record<string, any>>} - 返回一个 Promise，包含处理后的数据
    * @description 执行中间件流程，处理传入的上下文数据，并返回处理后的数据。
    */
-  public async pipingData(data:Record<string,any>,middlewares?:MiddleWare[]){
-    try{
-      await this.compose(middlewares||this.middlewares)(data);
+  public async pipingData(data: Record<string, any>, middlewares?: MiddleWare[]) {
+    try {
+      await this.compose(middlewares || this.middlewares)(data)
       return Promise.resolve(data)
-    }catch(err){
+    } catch (err) {
       return Promise.reject(err)
+    }
   }
-  };
 }
