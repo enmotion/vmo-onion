@@ -7,12 +7,12 @@
  * @FilePath: \mod-onion\src\index.js
  */
 'use strict'
-export type MiddleWare<T extends Record<string, any>> = (...arg: any) => (context: T, next: Function) => any
+export type MiddleWare<T extends any> = (...arg: any) => (context: T, next: Function) => any
 /**
  * @class VmoOnion
  * @description 实现一个基于洋葱模型的中间件处理类，用于按顺序执行一系列中间件函数。
  */
-export default class VmoOnion<T extends Record<string, any>> {
+export default class VmoOnion<T extends any> {
   private middlewares: MiddleWare<T>[]
   private composedMiddleware: Function | null = null
   /**

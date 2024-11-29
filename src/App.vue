@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import VmoOnion from '@lib'
-const onion = new VmoOnion()
+const onion = new VmoOnion<Record<string, any>>()
 onion.use(function () {
   // console.log('1')
   return async function (context, next) {
