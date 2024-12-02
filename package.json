@@ -26,11 +26,14 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@types/md5": "^2.3.5",
     "@types/node": "^20.10.4",
+    "@types/ramda": "^0.30.2",
     "@vitejs/plugin-vue": "^4.5.0",
     "@vitest/coverage-v8": "^2.1.5",
     "autoprefixer": "^10.4.16",
     "jsdom": "^25.0.1",
+    "md5": "^2.3.0",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.3.6",
     "typescript": "^5.2.2",
@@ -39,5 +42,8 @@
     "vitest": "^2.1.5",
     "vue": "^3.4.27",
     "vue-tsc": "^1.8.22"
+  },
+  "peerDependencies": {
+    "ramda": "^0.30.0"
   }
 }

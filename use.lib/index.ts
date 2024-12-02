@@ -7,7 +7,10 @@
  * @FilePath: \mod-onion\src\index.js
  */
 'use strict'
-export type MiddleWare<T extends any> = (...arg: any) => (context: T, next: Function) => any
+import { clone } from 'ramda'
+export type MiddleWare<T extends any> = (
+  ...arg: any
+) => (context: T, next: Function) => any | Promise<any> | Promise<void>
 /**
  * @class VmoOnion
  * @description 实现一个基于洋葱模型的中间件处理类，用于按顺序执行一系列中间件函数。
@@ -64,6 +67,10 @@ export default class VmoOnion<T extends any> {
           index = i
           let fn = middlewares[i]?.()
           if (i === middlewares.length) fn = next
+          /**
+           * 此处 【!fn】是作为代码健壮性考量，当洋葱皮核心层继续 调用 next 时，发现层级index 无法再匹配到任何 next 方法，则会直接返回结果。
+           * 避免了核心层误写了 await next() 方法出现的报错，等同自动识别并修正这种错误情况！
+           */
           if (!fn) return Promise.resolve()
           return Promise.resolve(fn(context, dispatch.bind(null, i + 1)))
         } catch (err) {
@@ -96,13 +103,13 @@ export default class VmoOnion<T extends any> {
    */
   public async pipingData(data: Record<string, any>, middlewares?: MiddleWare<T>[]) {
     try {
+      const d = clone(data) // 此处深度复制 data 是为了防止数据污染与内存泄漏的可能
       if (!!middlewares) {
         this.checkMiddleWares(middlewares)
-        await this.compose(middlewares)(data)
+        return (await this.compose(middlewares)(d)) ?? d
       } else {
-        await this.getComposedMiddleware()(data)
+        return (await this.getComposedMiddleware()(d)) ?? d
       }
-      return Promise.resolve(data)
     } catch (err) {
       return Promise.reject(err)
     }
