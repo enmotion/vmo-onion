@@ -106,9 +106,9 @@ export default class VmoOnion<T extends any> {
       const d = clone(data) // 此处深度复制 data 是为了防止数据污染与内存泄漏的可能
       if (!!middlewares) {
         this.checkMiddleWares(middlewares)
-        return (await this.compose(middlewares)(d)) ?? d
+        return (await this.compose(middlewares)(d)) ?? d //根据设计目的, 有时中间件类似流水线加工，不会返回具体的数据，而是流式加工数据，那么则需要返回 d
       } else {
-        return (await this.getComposedMiddleware()(d)) ?? d
+        return (await this.getComposedMiddleware()(d)) ?? d //根据设计目的, 有时中间件类似流水线加工，同上
       }
     } catch (err) {
       return Promise.reject(err)

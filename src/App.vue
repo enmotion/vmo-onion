@@ -130,6 +130,22 @@ setTimeout(() => {
     console.log(res, '7')
   })
 }, 2000)
+
+const onion2 = new VmoOnion<Record<string, any>>()
+
+onion2.use(function () {
+  // console.log('1')
+  return async function (context, next) {
+    console.log('Error Middleware')
+    context = await next()
+    throw new Error('Something went wrong!')
+  }
+})
+
+onion2
+  .pipingData({})
+  .then(res => console.log('Process completed successfully.', res))
+  .catch(error => console.error('Error caught:', error)) // Error caught: Error: Something went wrong!
 </script>
 
 <template>
