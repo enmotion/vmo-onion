@@ -62,7 +62,7 @@ onion.use(function () {
   // console.log('4')
   return async context => {
     const hash = md5(JSON.stringify(context))
-    if (queue[hash] && (!queue[hash].expired || Date.now() < queue[hash].expired)) {
+    if (queue[hash] && (!queue[hash]?.expired || queue[hash]?.expired! > Date.now())) {
       if (queue[hash].status == 'fullfilled') {
         context.response = queue[hash].data
         return {
@@ -92,7 +92,7 @@ onion.use(function () {
         setTimeout(async () => {
           queue[hash].data = { test: context.count }
           queue[hash].status = 'fullfilled'
-          queue[hash].expired = Date.now() + (queue[hash].expired ?? 1000)
+          queue[hash].expired = Date.now() + (queue[hash]?.expired ?? 1000)
           console.error('add prop data be {test:1}', hash)
           queue[hash].promises.forEach(item => {
             item.resolve({
@@ -135,9 +135,8 @@ const onion2 = new VmoOnion<Record<string, any>>()
 
 onion2.use(function () {
   // console.log('1')
-  return async function (context, next) {
+  return async function () {
     console.log('Error Middleware')
-    context = await next()
     throw new Error('Something went wrong!')
   }
 })
