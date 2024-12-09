@@ -16,7 +16,9 @@
     "./*": "./*"
   },
   "files": [
-    "dist"
+    "dist",
+    "package.json",
+    "README.md"
   ],
   "scripts": {
     "coverage": "vitest run --coverage",
