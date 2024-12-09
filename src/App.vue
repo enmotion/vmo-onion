@@ -1,13 +1,8 @@
 <script setup lang="ts">
 import { VmoOnion } from '../index'
-import type { MiddleWare } from '../index'
 import md5 from 'md5'
 const onion = new VmoOnion<Omit<Record<string, any>, 'count'> & { count: number }>()
-const m: MiddleWare<Record<string, boolean>> = function (config) {
-  return (context, next) => {
-    context.sss = false
-  }
-}
+
 onion.use(function () {
   // console.log('1')
   return async function (context, next) {
