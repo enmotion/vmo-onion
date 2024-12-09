@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import VmoOnion from '../use.lib/index'
+import { VmoOnion } from '../index'
 
 describe('test', () => {
   it('should throw TypeError if middlewares is not an array', () => {

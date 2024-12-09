@@ -15,7 +15,46 @@ npm i vmo-onion
 Ensure your project supports ES6 module syntax. You can import the library using the following code:
 
 ```javascript
-import VmoOnion from 'vmo-onion'
+import { VmoOnion } from 'vmo-onion'
+import type { MiddleWare } from 'vmo-onion'
+
+// create a instance of VmoOnion
+const onion = new VmoOnion<{ value: number }>()
+
+// define middleware width context type
+const middleware1: MiddleWare<{ value: number }> = function () {
+  return async function (context, next) {
+    console.log('Middleware 1: first step')
+    context.value += 1
+    await next()
+    console.log('Middleware 1: final step')
+  }
+}
+
+const middleware2: MiddleWare<{ value: number }> = function () {
+  return async function (context, next) {
+    console.log('Middleware 2: first step')
+    context.value += 1
+    console.log('Middleware 2: final step')
+  }
+}
+
+// 使用中间件
+onion.use(middleware1)
+onion.use(middleware2)
+
+// 定义初始上下文
+const initialContext = { value: 0 }
+
+// 执行中间件处理
+onion
+  .pipingData(initialContext)
+  .then(context => {
+    console.log('Processed Context:', context) // { value: 2 }
+  })
+  .catch(err => {
+    console.error('Error:', err)
+  })
 ```
 
 ### Define Middleware

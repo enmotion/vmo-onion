@@ -80,14 +80,15 @@ onion
 
 一个处理流程简单的应用可能如下所示：
 
-```javascript
-import VmoOnion from 'vmo-onion'
+```typescript
+import { VmoOnion } from 'vmo-onion'
+import type { MiddleWare } from 'vmo-onion'
 
 // 创建一个 VmoOnion 实例
-const onion = new VmoOnion()
+const onion = new VmoOnion<{ value: number }>()
 
 // 定义中间件
-const middleware1 = function () {
+const middleware1: MiddleWare<{ value: number }> = function () {
   return async function (context, next) {
     console.log('Middleware 1: first step')
     context.value += 1
@@ -96,7 +97,7 @@ const middleware1 = function () {
   }
 }
 
-const middleware2 = function () {
+const middleware2: MiddleWare<{ value: number }> = function () {
   return async function (context, next) {
     console.log('Middleware 2: first step')
     context.value += 1
@@ -191,6 +192,16 @@ onion
 
 - new VmoOnion([middlewares])：创建一个 VmoOnion 实例并可选地初始化中间件数组。
   - middlewares 一个包含中间件函数的数组，按顺序执行。如果未提供，则初始化为空数组。
+- ts 指定 context 类型
+
+```typescript
+const VO = new VmoOinion<Record<string, number>>() // 声明了 context 的类型 为 Record<string,number>
+const mid: MiddleWare<Record<string, number>> = function (config: any) {
+  return (context, next) => {
+    context // Record<string,number>
+  }
+}
+```
 
 ##### 实例方法
 
