@@ -78,11 +78,11 @@ describe('test', () => {
         })
       }
     }
-    onion.use(mockMiddleware)
+    onion.use(mockMiddleware).use(mockMiddleware).use(mockMiddleware)
     onion.use(mockMiddleware)
     onion.use(mockMiddleware)
     const result = await onion.pipingData({ counter: 0 })
-    expect(result.counter).toBe(3)
+    expect(result.counter).toBe(5)
   })
   it('should execute middlewares in order with init middleware', async () => {
     const mockMiddleware = function () {

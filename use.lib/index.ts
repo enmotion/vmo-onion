@@ -92,6 +92,7 @@ export default class VmoOnion<T extends any> {
     }
     this.middlewares.push(func)
     this.composedMiddleware = null // 当添入了新的中间件后，则会清理之前的缓存组合
+    return this
   }
   /**
    * @public
