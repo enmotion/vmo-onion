@@ -1,26 +1,26 @@
-# VmoOnion 中间件处理库
+# vmo-onion
 
-`VmoOnion` 是一个基于洋葱模型的中间件处理类，用于按顺序执行一系列中间件函数。该库适用于需要逐步处理请求或数据流且每个处理步骤都能控制后续步骤执行的场景。
+`vmo-onion` is a middleware processing class based on the onion model, designed to execute a series of middleware functions in sequence. This library is suitable for scenarios where requests or data streams need to be processed step-by-step, with each processing step controlling the execution of subsequent steps.
 
-## 安装
+## Installation
 
 ```
 npm i vmo-onion
 ```
 
-## 使用方法
+## Usage
 
-### 导入库
+### Import the Library
 
-确保您的项目支持 ES6 模块语法。您可以使用以下代码导入库：
+Ensure your project supports ES6 module syntax. You can import the library using the following code:
 
 ```javascript
 import { VmoOnion } from 'vmo-onion'
 ```
 
-### 定义中间件
+### Define Middleware
 
-中间件是一个接收两个参数的函数：上下文对象和一个 next 函数。每个中间件可以选择是否调用 next 来传递控制到下一个中间件。
+Middleware is a function return a function that takes two parameters: a context object and a next function. Each middleware can choose whether to call next to pass control to the next middleware.
 
 ```javascript
 const middleware1 = function () {
@@ -43,17 +43,17 @@ const middleware2 = function () {
 }
 ```
 
-##### 注意：中间件函数可以是同步或异步（返回 Promise）。
+##### Note: Middleware functions can be synchronous or asynchronous (returning a Promise).
 
-### 创建 `VmoOnion` 实例
+### Create `vmo-onion` Instance
 
-您可以通过一个中间件数组来初始化 `VmoOnion` 实例。
+You can initialize a `vmo-onion` instance with an array of middleware functions.
 
 ```javascript
 const onion = new VmoOnion([middleware1, middleware2])
 ```
 
-或者，您可以初始化空实例并在之后通过 use 方法添加中间件：
+Alternatively, you can initialize an empty instance and add middleware using the use method:
 
 ```javascript
 const onion = new VmoOnion()
@@ -61,9 +61,9 @@ onion.use(middleware1)
 onion.use(middleware2)
 ```
 
-### 处理数据
+### Process Data
 
-使用 `pipingData` 方法来处理数据。该方法接收一个上下文对象和一个可选的中间件数组，并返回一个 `Promise`，该 `Promise` 解析为处理后的上下文对象。
+Use the `pipingData` method to process data. This method takes a context object and an optional array of middleware functions, and returns a `Promise` that resolves to the processed context object.
 
 ```javascript
 const contextData = { value: 0 }
@@ -74,17 +74,17 @@ onion
   .catch(err => console.error('Error:', err))
 ```
 
-在这个例子中，控制将按以下顺序通过中间件：middleware1 -> middleware2。每个中间件之后会从其后的中间件反向返回。
+In this example, control will flow through the middleware in the following order: middleware1 -> middleware2. Each middleware will return from its subsequent middleware in reverse order.
 
-### 示例
+### Example
 
-一个处理流程简单的应用可能如下所示：
+A simple application of the processing flow might look like this:
 
 ```typescript
 import { VmoOnion } from 'vmo-onion'
 import type { MiddleWare } from 'vmo-onion'
 
-// 创建一个 VmoOnion 实例
+// create an instance of VmoOnion
 const onion = new VmoOnion<{ value: number }>()
 
 // 定义中间件
@@ -105,14 +105,13 @@ const middleware2: MiddleWare<{ value: number }> = function () {
   }
 }
 
-// 使用中间件
+// use middleware
 onion.use(middleware1)
 onion.use(middleware2)
 
-// 定义初始上下文
+// init context
 const initialContext = { value: 0 }
 
-// 执行中间件处理
 onion
   .pipingData(initialContext)
   .then(context => {
@@ -123,7 +122,7 @@ onion
   })
 ```
 
-预期输出：
+Expected output:
 
 ```
 Middleware 1: first step
@@ -166,14 +165,16 @@ onion
   })
 ``` -->
 
-### 错误处理
+### Error Handling
 
-如果任一中间件抛出异常或返回拒绝的 Promise，该错误将在 pipingData 方法的 catch 处理程序中被捕获。
+If any middleware throws an exception or returns a rejected `Promise`, the error will be caught in the `catch` handler of the `pipingData` method.
 
 ```javascript
-const errorMiddleware = (context, next) => {
-  console.log('Error Middleware')
-  throw new Error('Something went wrong!')
+const errorMiddleware = function () {
+  return (context, next) => {
+    console.log('Error Middleware')
+    throw new Error('Something went wrong!')
+  }
 }
 
 onion.use(errorMiddleware)
@@ -186,44 +187,34 @@ onion
 
 ### API
 
-#### 类 VmoOnion
+#### Class VmoOnion
 
-##### 构造函数
+##### Constructor
 
-- new VmoOnion([middlewares])：创建一个 VmoOnion 实例并可选地初始化中间件数组。
-  - middlewares 一个包含中间件函数的数组，按顺序执行。如果未提供，则初始化为空数组。
-- ts 指定 context 类型
+- new VmoOnion([middlewares]): Creates a VmoOnion instance and optionally initializes an array of middleware functions.
+  - middlewares: An array of middleware functions to be executed in sequence. If not provided, it initializes as an empty array.
 
-```typescript
-const VO = new VmoOinion<Record<string, number>>() // 声明了 context 的类型 为 Record<string,number>
-const mid: MiddleWare<Record<string, number>> = function (config: any) {
-  return (context, next) => {
-    context // Record<string,number>
-  }
-}
-```
+##### Instance Methods
 
-##### 实例方法
+- use(func): Adds a middleware function to the middleware stack.
 
-- use(func)：将一个中间件函数添加到中间件栈中。
+  - func: The middleware function.
 
-  - func 中间件函数。
+- pipingData(data, [middlewares]): Processes the context object through the middleware stack.
 
-- pipingData(data, [middlewares])：通过中间件栈处理数据上下文。
+  - data: The context object to be modified step-by-step by the middleware.
+  - middlewares: Optional, an array of middleware functions to be executed. Defaults to the middleware array initialized in the instance.
 
-  - data 上下文对象，会被中间件逐步修改。
-  - middlewares 可选，要执行的中间件数组。默认使用实例化时的中间件数组。
+##### Private Methods
 
-##### 私有方法
+- checkMiddleWares(middlewares): Checks if the middleware array is valid, i.e., whether it is an array of functions.
 
-- checkMiddleWares(middlewares)：检查中间件数组是否合法，即是否为函数的数组。
+  - middlewares: The middleware array.
 
-  - middlewares 中间件数组。
+- compose(middlewares): Composes the middleware array into a single function that executes all middleware in sequence.
 
-- compose(middlewares)：将中间件数组组合成一个函数，该函数按顺序执行所有中间件。
+  -middlewares: The middleware array.
 
-  -middlewares 中间件数组。
+##### Error Handling Mechanism
 
-##### 错误处理机制
-
-库确保不会多次调用 `next()` 导致无限递归。当发生这种情况时，库会以错误信息 `next() called multiple times` 拒绝 `Promise`。
+The library ensures that `next()` is not called multiple times, preventing infinite recursion. When this occurs, the library rejects the `Promise` with the error message `next() called multiple times`.
