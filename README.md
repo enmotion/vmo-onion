@@ -15,7 +15,7 @@ npm i vmo-onion
 确保您的项目支持 ES6 模块语法。您可以使用以下代码导入库：
 
 ```javascript
-import VmoOnion from 'vmo-onion'
+import { VmoOnion } from 'vmo-onion'
 ```
 
 ### 定义中间件

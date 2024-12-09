@@ -16,45 +16,6 @@ Ensure your project supports ES6 module syntax. You can import the library using
 
 ```javascript
 import { VmoOnion } from 'vmo-onion'
-import type { MiddleWare } from 'vmo-onion'
-
-// create a instance of VmoOnion
-const onion = new VmoOnion<{ value: number }>()
-
-// define middleware width context type
-const middleware1: MiddleWare<{ value: number }> = function () {
-  return async function (context, next) {
-    console.log('Middleware 1: first step')
-    context.value += 1
-    await next()
-    console.log('Middleware 1: final step')
-  }
-}
-
-const middleware2: MiddleWare<{ value: number }> = function () {
-  return async function (context, next) {
-    console.log('Middleware 2: first step')
-    context.value += 1
-    console.log('Middleware 2: final step')
-  }
-}
-
-// 使用中间件
-onion.use(middleware1)
-onion.use(middleware2)
-
-// 定义初始上下文
-const initialContext = { value: 0 }
-
-// 执行中间件处理
-onion
-  .pipingData(initialContext)
-  .then(context => {
-    console.log('Processed Context:', context) // { value: 2 }
-  })
-  .catch(err => {
-    console.error('Error:', err)
-  })
 ```
 
 ### Define Middleware
@@ -119,14 +80,15 @@ In this example, control will flow through the middleware in the following order
 
 A simple application of the processing flow might look like this:
 
-```javascript
-import VmoOnion from 'vmo-onion'
+```typescript
+import { VmoOnion } from 'vmo-onion'
+import type { MiddleWare } from 'vmo-onion'
 
-// 创建一个 VmoOnion 实例
-const onion = new VmoOnion()
+// create an instance of VmoOnion
+const onion = new VmoOnion<{ value: number }>()
 
 // 定义中间件
-const middleware1 = function () {
+const middleware1: MiddleWare<{ value: number }> = function () {
   return async function (context, next) {
     console.log('Middleware 1: first step')
     context.value += 1
@@ -135,7 +97,7 @@ const middleware1 = function () {
   }
 }
 
-const middleware2 = function () {
+const middleware2: MiddleWare<{ value: number }> = function () {
   return async function (context, next) {
     console.log('Middleware 2: first step')
     context.value += 1
@@ -143,14 +105,13 @@ const middleware2 = function () {
   }
 }
 
-// 使用中间件
+// use middleware
 onion.use(middleware1)
 onion.use(middleware2)
 
-// 定义初始上下文
+// init context
 const initialContext = { value: 0 }
 
-// 执行中间件处理
 onion
   .pipingData(initialContext)
   .then(context => {
@@ -209,9 +170,11 @@ onion
 If any middleware throws an exception or returns a rejected `Promise`, the error will be caught in the `catch` handler of the `pipingData` method.
 
 ```javascript
-const errorMiddleware = (context, next) => {
-  console.log('Error Middleware')
-  throw new Error('Something went wrong!')
+const errorMiddleware = function () {
+  return (context, next) => {
+    console.log('Error Middleware')
+    throw new Error('Something went wrong!')
+  }
 }
 
 onion.use(errorMiddleware)
