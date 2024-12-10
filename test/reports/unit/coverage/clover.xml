@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1733717367294" clover="3.2.0">
-  <project timestamp="1733717367294" name="All files">
+<coverage generated="1733797474023" clover="3.2.0">
+  <project timestamp="1733797474023" name="All files">
     <metrics statements="63" coveredstatements="63" conditionals="32" coveredconditionals="32" methods="8" coveredmethods="8" elements="103" coveredelements="103" complexity="0" loc="63" ncloc="63" packages="1" files="1" classes="1"/>
     <file name="index.ts" path="/Users/enmotion/works/npm-project/vmo-onion/use.lib/index.ts">
       <metrics statements="63" coveredstatements="63" conditionals="32" coveredconditionals="32" methods="8" coveredmethods="8"/>
