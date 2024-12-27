@@ -3,53 +3,41 @@ import { VmoOnion } from '../index'
 import md5 from 'md5'
 const onion = new VmoOnion<Omit<Record<string, any>, 'count'> & { count: number }>()
 
-onion.use(function () {
-  // console.log('1')
-  return async function (context, next) {
-    context.count = context.count || 0
-    console.log(JSON.stringify(context))
-    context = await next()
-    console.log(JSON.stringify(context))
-    return context
-  }
+onion.use(async function (context, next) {
+  context.count = context.count || 0
+  console.log(JSON.stringify(context))
+  context = await next()
+  console.log(JSON.stringify(context))
+  return context
 })
-onion.use(function () {
-  // console.log('2')
-  return async (context, next) => {
-    context.count = context.count + 1
-    console.log(JSON.stringify(context))
-    context = await next()
-    console.log(JSON.stringify(context))
-    context.count = context.count - 1
-    return context
-  }
+onion.use(async (context, next) => {
+  context.count = context.count + 1
+  console.log(JSON.stringify(context))
+  context = await next()
+  console.log(JSON.stringify(context))
+  context.count = context.count - 1
+  return context
 })
-onion.use(function () {
-  // console.log('3')
-  return async (context, next) => {
-    context.count = context.count + 1
-    console.log(JSON.stringify(context))
-    context = await next()
-    console.log(JSON.stringify(context))
-    context.count = context.count - 1
-    return context
-  }
+onion.use(async (context, next) => {
+  context.count = context.count + 1
+  console.log(JSON.stringify(context))
+  context = await next()
+  console.log(JSON.stringify(context))
+  context.count = context.count - 1
+  return context
 })
-onion.use(function () {
-  // console.log('4')
-  return async (context, next) => {
-    return new Promise(resolve => {
-      setTimeout(async () => {
-        context.count = context.count + 1
-        console.log(JSON.stringify(context))
-        context = await next()
-        console.log(context, 'context')
-        console.log(JSON.stringify(context))
-        context.count = context.count - 1
-        resolve(context)
-      }, 200)
-    })
-  }
+onion.use(async (context, next) => {
+  return new Promise(resolve => {
+    setTimeout(async () => {
+      context.count = context.count + 1
+      console.log(JSON.stringify(context))
+      context = await next()
+      console.log(context, 'context')
+      console.log(JSON.stringify(context))
+      context.count = context.count - 1
+      resolve(context)
+    }, 200)
+  })
 })
 const queue: {
   [key: string]: {
@@ -59,51 +47,48 @@ const queue: {
     expired?: number
   }
 } = {}
-onion.use(function () {
-  // console.log('4')
-  return async context => {
-    const hash = md5(JSON.stringify(context))
-    if (queue[hash] && (!queue[hash]?.expired || queue[hash]?.expired! > Date.now())) {
-      if (queue[hash].status == 'fullfilled') {
-        context.response = queue[hash].data
-        return {
-          count: 0,
-          response: queue[hash].data
-        }
-      } else {
-        console.warn('length:', queue[hash].promises.length)
-        return new Promise((resolve, reject) => {
-          queue[hash].promises.push({
-            resolve,
-            reject
-          })
-        })
+onion.use(async context => {
+  const hash = md5(JSON.stringify(context))
+  if (queue[hash] && (!queue[hash]?.expired || queue[hash]?.expired! > Date.now())) {
+    if (queue[hash].status == 'fullfilled') {
+      context.response = queue[hash].data
+      return {
+        count: 0,
+        response: queue[hash].data
       }
     } else {
-      queue[hash] = {
-        promises: [],
-        data: null,
-        status: 'padding'
-      }
+      console.warn('length:', queue[hash].promises.length)
       return new Promise((resolve, reject) => {
         queue[hash].promises.push({
           resolve,
           reject
         })
-        setTimeout(async () => {
-          queue[hash].data = { test: context.count }
-          queue[hash].status = 'fullfilled'
-          queue[hash].expired = Date.now() + (queue[hash]?.expired ?? 1000)
-          console.error('add prop data be {test:1}', hash)
-          queue[hash].promises.forEach(item => {
-            item.resolve({
-              ...context,
-              response: queue[hash].data
-            })
-          })
-        }, 200)
       })
     }
+  } else {
+    queue[hash] = {
+      promises: [],
+      data: null,
+      status: 'padding'
+    }
+    return new Promise((resolve, reject) => {
+      queue[hash].promises.push({
+        resolve,
+        reject
+      })
+      setTimeout(async () => {
+        queue[hash].data = { test: context.count }
+        queue[hash].status = 'fullfilled'
+        queue[hash].expired = Date.now() + (queue[hash]?.expired ?? 1000)
+        console.error('add prop data be {test:1}', hash)
+        queue[hash].promises.forEach(item => {
+          item.resolve({
+            ...context,
+            response: queue[hash].data
+          })
+        })
+      }, 200)
+    })
   }
 })
 onion.pipingData({ count: 0 }).then(res => {

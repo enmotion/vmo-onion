@@ -38,45 +38,37 @@ describe('test', () => {
   })
   it('should handle next() call multiple times correctly', async () => {
     const vmoOnion = new VmoOnion()
-    const middleware = function () {
-      return async function (context, next) {
-        await next()
-        await next()
-      }
+    async function middleware(context, next) {
+      await next()
+      await next()
     }
     vmoOnion.use(middleware as any)
     await expect(vmoOnion.pipingData({})).rejects.toThrow('next() called multiple times')
   })
   it('should handle custom middlewares array in pipingData', async () => {
     const vmoOnion = new VmoOnion()
-    const middleware1 = function () {
-      return async function (context, next) {
-        console.log(context)
-        context.counter = 1
-        await next()
-      }
+    const middleware1 = async function (context, next) {
+      console.log(context)
+      context.counter = 1
+      await next()
     }
-    const middleware2 = function () {
-      return async function (context, next) {
-        context.counter++
-      }
+    const middleware2 = async function (context, next) {
+      context.counter++
     }
     const result = await vmoOnion.pipingData({}, [middleware1, middleware2])
     expect(result.counter).toBe(2)
   })
   it('should execute middlewares in order with use setting', async () => {
     const onion = new VmoOnion()
-    const mockMiddleware = function () {
-      return async function (context, next) {
-        return new Promise((resolve, reject) => {
-          context.counter = context.counter || 0
-          context.counter++
-          setTimeout(async () => {
-            await next()
-            resolve(context)
-          }, 100)
-        })
-      }
+    const mockMiddleware = async function (context, next) {
+      return new Promise((resolve, reject) => {
+        context.counter = context.counter || 0
+        context.counter++
+        setTimeout(async () => {
+          await next()
+          resolve(context)
+        }, 100)
+      })
     }
     onion.use(mockMiddleware).use(mockMiddleware).use(mockMiddleware)
     onion.use(mockMiddleware)
@@ -85,76 +77,66 @@ describe('test', () => {
     expect(result.counter).toBe(5)
   })
   it('should execute middlewares in order with init middleware', async () => {
-    const mockMiddleware = function () {
-      return async function (context, next) {
-        return new Promise((resolve, reject) => {
-          context.counter = context.counter || 0
-          context.counter++
-          setTimeout(async () => {
-            await next()
-            resolve(context)
-          }, 100)
-        })
-      }
+    const mockMiddleware = async function (context, next) {
+      return new Promise((resolve, reject) => {
+        context.counter = context.counter || 0
+        context.counter++
+        setTimeout(async () => {
+          await next()
+          resolve(context)
+        }, 100)
+      })
     }
     const onion = new VmoOnion([mockMiddleware, mockMiddleware, mockMiddleware])
     const result = await onion.pipingData({ counter: 0 })
     expect(result.counter).toBe(3)
   })
   it('should finally change context index with init setting', async () => {
-    const mockMiddleware = function () {
-      return async function (context, next) {
-        return new Promise((resolve, reject) => {
-          context.counter = context.counter || 0
-          context.counter++
-          setTimeout(async () => {
-            context = await next()
-            resolve(context)
-          }, 100)
-        })
-      }
+    const mockMiddleware = async function (context, next) {
+      return new Promise((resolve, reject) => {
+        context.counter = context.counter || 0
+        context.counter++
+        setTimeout(async () => {
+          context = await next()
+          resolve(context)
+        }, 100)
+      })
     }
     const onion = new VmoOnion([
       mockMiddleware,
       mockMiddleware,
-      function () {
-        return async function (context, next) {
-          return new Promise((resolve, reject) => {
-            setTimeout(async () => {
-              await next()
-              resolve({ counter: 12 })
-            }, 100)
-          })
-        }
+      async function (context, next) {
+        return new Promise((resolve, reject) => {
+          setTimeout(async () => {
+            await next()
+            resolve({ counter: 12 })
+          }, 100)
+        })
       }
     ])
     const result = await onion.pipingData({ counter: 0 })
     expect(result.counter).toBe(12)
   })
   it('should update context index with init setting', async () => {
-    const mockMiddleware = function () {
-      return async function (context, next) {
-        return new Promise((resolve, reject) => {
-          context.counter = context.counter || 0
-          context.counter++
-          setTimeout(async () => {
-            context = await next()
-            resolve(null)
-          }, 100)
-        })
-      }
+    const mockMiddleware = async function (context, next) {
+      return new Promise((resolve, reject) => {
+        context.counter = context.counter || 0
+        context.counter++
+        setTimeout(async () => {
+          context = await next()
+          resolve(null)
+        }, 100)
+      })
     }
     const onion = new VmoOnion([
       mockMiddleware,
       mockMiddleware,
-      function () {
-        return async function (context, next) {
-          return new Promise((resolve, reject) => {
-            setTimeout(() => {
-              resolve({ counter: 12 })
-            }, 2000)
-          })
-        }
+      async function (context, next) {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve({ counter: 12 })
+          }, 2000)
+        })
       }
     ])
     const result = await onion.pipingData({ counter: 0 })

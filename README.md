@@ -23,23 +23,19 @@ import { VmoOnion } from 'vmo-onion'
 Middleware is a function return a function that takes two parameters: a context object and a next function. Each middleware can choose whether to call next to pass control to the next middleware.
 
 ```javascript
-const middleware1 = function () {
-  return async function (context, next) {
-    console.log('Middleware 1 start')
-    context.value = 1
-    await next()
-    context.value = 1
-    console.log('Middleware 1 end')
-  }
+const middleware1 = async function (context, next) {
+  console.log('Middleware 1 start')
+  context.value = 1
+  await next()
+  context.value = 1
+  console.log('Middleware 1 end')
 }
 
-const middleware2 = function () {
-  return async function (context, next) {
-    console.log('Middleware 2 start')
-    context.value = 2
-    context.value = 2
-    console.log('Middleware 2 end')
-  }
+const middleware2 = async function (context, next) {
+  console.log('Middleware 2 start')
+  context.value = 2
+  context.value = 2
+  console.log('Middleware 2 end')
 }
 ```
 
@@ -88,21 +84,17 @@ import type { MiddleWare } from 'vmo-onion'
 const onion = new VmoOnion<{ value: number }>()
 
 // 定义中间件
-const middleware1: MiddleWare<{ value: number }> = function () {
-  return async function (context, next) {
-    console.log('Middleware 1: first step')
-    context.value += 1
-    await next()
-    console.log('Middleware 1: final step')
-  }
+const middleware1: MiddleWare<{ value: number }> = async function (context, next) {
+  console.log('Middleware 1: first step')
+  context.value += 1
+  await next()
+  console.log('Middleware 1: final step')
 }
 
-const middleware2: MiddleWare<{ value: number }> = function () {
-  return async function (context, next) {
-    console.log('Middleware 2: first step')
-    context.value += 1
-    console.log('Middleware 2: final step')
-  }
+const middleware2: MiddleWare<{ value: number }> = async function (context, next) {
+  console.log('Middleware 2: first step')
+  context.value += 1
+  console.log('Middleware 2: final step')
 }
 
 // use middleware
@@ -137,11 +129,9 @@ Processed Context: { value: 2 }
 If any middleware throws an exception or returns a rejected `Promise`, the error will be caught in the `catch` handler of the `pipingData` method.
 
 ```javascript
-const errorMiddleware = function () {
-  return (context, next) => {
-    console.log('Error Middleware')
-    throw new Error('Something went wrong!')
-  }
+const errorMiddleware = (context, next) => {
+  console.log('Error Middleware')
+  throw new Error('Something went wrong!')
 }
 
 onion.use(errorMiddleware)
@@ -169,10 +159,8 @@ import type { MiddleWare } from 'vmo-onion'
 const onion = new VmoOnion<{ name: string; age: number }>([])
 // From now on, the middleware must accept parameters with the Context type as {name: string, age: number}
 // or
-const sampleMiddleWare: MiddleWare<{ name: string; age: number }> = function (config: any) {
-  return (context, next) => {
-    //.....
-  }
+const sampleMiddleWare: MiddleWare<{ name: string; age: number }> = (context, next) => {
+  //.....
 }
 ```
 

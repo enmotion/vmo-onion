@@ -23,23 +23,19 @@ import { VmoOnion } from 'vmo-onion'
 中间件是一个接收两个参数的函数：上下文对象和一个 next 函数。每个中间件可以选择是否调用 next 来传递控制到下一个中间件。
 
 ```javascript
-const middleware1 = function () {
-  return async function (context, next) {
-    console.log('Middleware 1 start')
-    context.value = 1
-    await next()
-    context.value = 1
-    console.log('Middleware 1 end')
-  }
+const middleware1 = async function (context, next) {
+  console.log('Middleware 1 start')
+  context.value = 1
+  await next()
+  context.value = 1
+  console.log('Middleware 1 end')
 }
 
-const middleware2 = function () {
-  return async function (context, next) {
-    console.log('Middleware 2 start')
-    context.value = 2
-    context.value = 2
-    console.log('Middleware 2 end')
-  }
+const middleware2 = async function (context, next) {
+  console.log('Middleware 2 start')
+  context.value = 2
+  context.value = 2
+  console.log('Middleware 2 end')
 }
 ```
 
@@ -88,21 +84,17 @@ import type { MiddleWare } from 'vmo-onion'
 const onion = new VmoOnion<{ value: number }>()
 
 // 定义中间件
-const middleware1: MiddleWare<{ value: number }> = function () {
-  return async function (context, next) {
-    console.log('Middleware 1: first step')
-    context.value += 1
-    await next()
-    console.log('Middleware 1: final step')
-  }
+const middleware1: MiddleWare<{ value: number }> = async function (context, next) {
+  console.log('Middleware 1: first step')
+  context.value += 1
+  await next()
+  console.log('Middleware 1: final step')
 }
 
-const middleware2: MiddleWare<{ value: number }> = function () {
-  return async function (context, next) {
-    console.log('Middleware 2: first step')
-    context.value += 1
-    console.log('Middleware 2: final step')
-  }
+const middleware2: MiddleWare<{ value: number }> = async function (context, next) {
+  console.log('Middleware 2: first step')
+  context.value += 1
+  console.log('Middleware 2: final step')
 }
 
 // 使用中间件
@@ -196,10 +188,8 @@ onion
 
 ```typescript
 const VO = new VmoOinion<Record<string, number>>() // 声明了 context 的类型 为 Record<string,number>
-const mid: MiddleWare<Record<string, number>> = function (config: any) {
-  return (context, next) => {
-    context // Record<string,number>
-  }
+const mid: MiddleWare<Record<string, number>> = (context, next) => {
+  context // Record<string,number>
 }
 ```
 

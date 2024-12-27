@@ -8,9 +8,7 @@
  */
 'use strict'
 import { clone } from 'ramda'
-export type MiddleWare<T extends any> = (
-  ...arg: any
-) => (context: T, next: Function) => any | Promise<any> | Promise<void>
+export type MiddleWare<T extends any> = (context: T, next: Function) => any | Promise<any> | Promise<void>
 /**
  * @class VmoOnion
  * @description 实现一个基于洋葱模型的中间件处理类，用于按顺序执行一系列中间件函数。
@@ -65,7 +63,7 @@ export default class VmoOnion<T extends any> {
         try {
           if (i <= index) return Promise.reject(new Error('next() called multiple times'))
           index = i
-          let fn = middlewares[i]?.()
+          let fn = middlewares[i]
           if (i === middlewares.length) fn = next
           /**
            * 此处 【!fn】是作为代码健壮性考量，当洋葱皮核心层继续 调用 next 时，发现层级index 无法再匹配到任何 next 方法，则会直接返回结果。
