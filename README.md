@@ -2,6 +2,23 @@
 
 `vmo-onion` is a middleware processing class based on the onion model, designed to execute a series of middleware functions in sequence. This library is suitable for scenarios where requests or data streams need to be processed step-by-step, with each processing step controlling the execution of subsequent steps.
 
+
+## Documentation
+
+Complete bilingual VitePress documentation:
+
+[简体中文](https://enmotion.github.io/vmo-onion/zh/) · [English](https://enmotion.github.io/vmo-onion/)
+
+- [简体中文](docs/zh/index.md) · [快速开始](docs/zh/guide/getting-started.md) · [API](docs/zh/api.md)
+- [English](docs/index.md) · [Getting started](docs/guide/getting-started.md) · [API](docs/api.md)
+
+```sh
+npm run docs:dev
+npm run docs:build
+npm run docs:preview
+```
+
+
 ## Installation
 
 ```

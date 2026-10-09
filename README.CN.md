@@ -2,6 +2,23 @@
 
 `VmoOnion` 是一个基于洋葱模型的中间件处理类，用于按顺序执行一系列中间件函数。该库适用于需要逐步处理请求或数据流且每个处理步骤都能控制后续步骤执行的场景。
 
+
+## 文档
+
+完整的 VitePress 中英文文档：
+
+[简体中文](https://enmotion.github.io/vmo-onion/zh/) · [English](https://enmotion.github.io/vmo-onion/)
+
+- [简体中文](docs/zh/index.md) · [快速开始](docs/zh/guide/getting-started.md) · [API](docs/zh/api.md)
+- [English](docs/index.md) · [Getting started](docs/guide/getting-started.md) · [API](docs/api.md)
+
+```sh
+npm run docs:dev
+npm run docs:build
+npm run docs:preview
+```
+
+
 ## 安装
 
 ```

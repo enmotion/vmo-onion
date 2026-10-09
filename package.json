@@ -29,7 +29,11 @@
     "test:run": "vitest run",
     "test:e2e": "npm run build && node test/e2e/package.mjs",
     "prepack": "npm run build",
-    "check": "npm run coverage && npm run test:e2e"
+    "check": "npm run coverage && npm run test:e2e",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "docs:check": "npm run build && node test/e2e/docs.mjs && npm run docs:build"
   },
   "devDependencies": {
     "@types/md5": "^2.3.5",
@@ -45,6 +49,7 @@
     "typescript": "^5.2.2",
     "vite": "^5.0.0",
     "vite-plugin-dts": "^3.6.4",
+    "vitepress": "^1.6.4",
     "vitest": "^2.1.5",
     "vue": "^3.4.27",
     "vue-tsc": "^1.8.22"
