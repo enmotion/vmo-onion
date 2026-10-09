@@ -20,17 +20,16 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-     /* alias 配置 */
-     "baseUrl": "./", // 必须配置 baseUrl
+     /* 路径相对于当前 tsconfig.json，无需 baseUrl */
      "paths": {
-       "@src": ["src"], // 必须如此配置才能在ts中沿用 vite 的 alias 配置
-       "@src/*": ["src/*"], // 两个都需要....
-       "@type": ["types"], // 必须如此配置才能在ts中沿用 vite 的 alias 配置
-       "@type/*": ["types/*"], // 两个都需要....
-       "@comps": ["components"], // 必须如此配置才能在ts中沿用 vite 的 alias 配置
-       "@comps/*": ["components/*"], // 两个都需要....
-       "@lib": ["use.lib"], // 必须如此配置才能在ts中沿用 vite 的 alias 配置
-       "@lib/*": ["use.lib/*"], // 两个都需要....
+       "@src": ["./src"], // 与 Vite alias 保持一致
+       "@src/*": ["./src/*"], // 支持子路径导入
+       "@type": ["./types"], // 与 Vite alias 保持一致
+       "@type/*": ["./types/*"], // 支持子路径导入
+       "@comps": ["./components"], // 与 Vite alias 保持一致
+       "@comps/*": ["./components/*"], // 支持子路径导入
+       "@lib": ["./use.lib"], // 与 Vite alias 保持一致
+       "@lib/*": ["./use.lib/*"], // 支持子路径导入
      }
   },
   "include": ["index.ts", "src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "types/**/*.ts", "use.lib/**/*.ts", "components/**/*.ts", "components/**/*.tsx", "components/**/*.vue"],
