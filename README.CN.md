@@ -187,7 +187,7 @@ onion
 - ts 指定 context 类型
 
 ```typescript
-const VO = new VmoOinion<Record<string, number>>() // 声明了 context 的类型 为 Record<string,number>
+const VO = new VmoOnion<Record<string, number>>() // 声明了 context 的类型 为 Record<string,number>
 const mid: MiddleWare<Record<string, number>> = (context, next) => {
   context // Record<string,number>
 }
@@ -217,3 +217,30 @@ const mid: MiddleWare<Record<string, number>> = (context, next) => {
 ##### 错误处理机制
 
 库确保不会多次调用 `next()` 导致无限递归。当发生这种情况时，库会以错误信息 `next() called multiple times` 拒绝 `Promise`。
+
+
+## Compatibility and verification
+
+The public API and return semantics are unchanged: `use()` is chainable, an optional
+middleware array replaces the instance stack for that call, and the outermost
+middleware result is returned unless it is `null` or `undefined`, in which case the
+cloned context is returned. Use `return next()` to forward a downstream result.
+Always await or return `next()` to propagate asynchronous completion and errors.
+
+Each composed stack is a snapshot. Middleware added during an active execution
+applies to subsequent executions. Sparse middleware arrays are rejected.
+Context cloning preserves object prototypes, cycles and shared references and
+isolates Map keys/values and Set entries. The existing root `clone()` hook remains
+supported. Functions and unsupported opaque values (such as Promise and WeakMap)
+retain their existing reference behavior; cloning is not a memory-leak guarantee.
+
+- `npm run coverage`: all core source files must reach 100% statements, branches,
+  functions and lines.
+- `npm run test:e2e`: build, pack, install into a temporary consumer, execute ESM
+  and CommonJS scenarios, compile TypeScript consumers in NodeNext and Bundler
+  modes, and check the UMD global in an isolated JavaScript context.
+- `npm run check`: run coverage and package end-to-end verification.
+- Real browser verification: after building, run `npm run dev` and open
+  `/test/e2e/browser.html`. Both ESM and UMD run the same regression scenario;
+  the page reports PASS or FAIL. This browser check is separate from the Node
+  package test.

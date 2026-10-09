@@ -10,9 +10,11 @@ export default defineConfig({
     __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: true
   },
   test: {
-    environment: 'jsdom',
+    environment: 'node',
+    include: ['test/**/*.test.ts'],
     coverage: {
-      include: ['**/use.lib'],
+      include: ['index.ts', 'use.lib/**/*.ts'],
+      thresholds: { perFile: true, statements: 100, branches: 100, functions: 100, lines: 100 },
       provider: 'v8',
       reportsDirectory: './test/reports/unit/coverage'
     }

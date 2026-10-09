@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>VmoOnion browser E2E</title>
+<pre id="result">Running…</pre>
+<script src="../../dist/vmo-onion.umd.cjs"></script>
+<script src="./browser-scenario.js"></script>
+<script type="module">
+import { VmoOnion } from '../../dist/vmo-onion.js'
+const result = document.getElementById('result')
+try {
+  const esm = await verifyBrowser(VmoOnion)
+  const umd = await verifyBrowser(globalThis['vmo-onion'].VmoOnion)
+  result.textContent = `ESM ${esm}\nUMD ${umd}`
+  document.documentElement.dataset.status = 'passed'
+} catch (error) {
+  result.textContent = `FAIL: ${error.stack}`
+  document.documentElement.dataset.status = 'failed'
+  throw error
+}
+</script>
+</html>

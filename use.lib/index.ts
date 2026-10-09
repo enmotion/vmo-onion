@@ -7,7 +7,7 @@
  * @FilePath: \mod-onion\src\index.js
  */
 'use strict'
-import { clone } from 'ramda'
+import { cloneContext } from './clone-context'
 export type MiddleWare<T extends any> = (context: T, next: Function) => any | Promise<any> | Promise<void>
 /**
  * @class VmoOnion
@@ -37,7 +37,7 @@ export default class VmoOnion<T extends any> {
       throw new TypeError('Middlewares stack must be an array!')
     }
 
-    if (!middlewares.every(fn => typeof fn === 'function')) {
+    if (!Array.from(middlewares).every(fn => typeof fn === 'function')) {
       throw new TypeError('Middleware must be composed of functions!')
     }
   }
@@ -50,7 +50,8 @@ export default class VmoOnion<T extends any> {
    */
   private compose(middlewares: MiddleWare<T>[]): Function {
     this.checkMiddleWares(middlewares)
-    return function (context: T, next: MiddleWare<T>) {
+    const stack = middlewares.slice()
+    return function (context: T) {
       let index = -1
       return dispatch(0)
       /**
@@ -63,8 +64,7 @@ export default class VmoOnion<T extends any> {
         try {
           if (i <= index) return Promise.reject(new Error('next() called multiple times'))
           index = i
-          let fn = middlewares[i]
-          if (i === middlewares.length) fn = next
+          const fn = stack[i]
           /**
            * 此处 【!fn】是作为代码健壮性考量，当洋葱皮核心层继续 调用 next 时，发现层级index 无法再匹配到任何 next 方法，则会直接返回结果。
            * 避免了核心层误写了 await next() 方法出现的报错，等同自动识别并修正这种错误情况！
@@ -102,7 +102,7 @@ export default class VmoOnion<T extends any> {
    */
   public async pipingData(data: Record<string, any>, middlewares?: MiddleWare<T>[]) {
     try {
-      const d = clone(data) // 此处深度复制 data 是为了防止数据污染与内存泄漏的可能
+      const d = cloneContext(data) // 复制可克隆上下文，隔离本次执行的数据修改
       if (!!middlewares) {
         this.checkMiddleWares(middlewares)
         return (await this.compose(middlewares)(d)) ?? d //根据设计目的, 有时中间件类似流水线加工，不会返回具体的数据，而是流式加工数据，那么则需要返回 d
